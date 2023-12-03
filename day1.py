@@ -4,6 +4,7 @@ from typing import TextIO
 
 from aoc_toolkit import open_puzzle_input
 
+# There is no 0's in the input
 DIGITS = {c: c for c in string.digits} | {
     'one': '1',
     'two': '2',
@@ -16,7 +17,7 @@ DIGITS = {c: c for c in string.digits} | {
     'nine': '9',
 }
 
-_digit_re = re.compile(r'|'.join(DIGITS) + r'|[0-9]')
+_digit_re = re.compile(r'|'.join(DIGITS))
 
 
 def part1(input_: TextIO) -> int:
