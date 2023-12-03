@@ -1,3 +1,5 @@
+import functools
+import operator
 from collections import Counter
 from dataclasses import dataclass
 from typing import TextIO, Literal
@@ -5,12 +7,13 @@ from typing import TextIO, Literal
 from aoc_toolkit import open_puzzle_input
 
 Color = Literal["red", "blue", "green"]
+CubeSet = Counter[Color]
 
 
 @dataclass
 class Game:
     id: int
-    draw_sets: list[Counter[Color]]
+    draw_sets: list[CubeSet]
 
 
 def parse_games(input_: TextIO) -> list[Game]:
@@ -38,6 +41,18 @@ def part1(input_: TextIO) -> int:
     return sum(game.id for game in games if is_possible(game))
 
 
+def part2(input_: TextIO) -> int:
+    games = parse_games(input_)
+
+    def min_cube_set(game: Game) -> CubeSet:
+        return functools.reduce(operator.or_, game.draw_sets)
+
+    def set_power(set_: CubeSet) -> int:
+        return set_['red'] * set_['green'] * set_['blue']
+
+    return sum(set_power(min_cube_set(game)) for game in games)
+
+
 if __name__ == '__main__':
     with open_puzzle_input('day2') as f:
-        print(part1(f))
+        print(part2(f))
