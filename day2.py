@@ -24,7 +24,7 @@ def parse_games(input_: TextIO) -> list[Game]:
         game_id = int(game_header.removeprefix('Game '))
         draw_sets = []
         for draw_set_text in draw_sets_text.split('; '):
-            num_color_pairs = [tuple(chunk.split()) for chunk in draw_set_text.split(', ')]
+            num_color_pairs = [chunk.split() for chunk in draw_set_text.split(', ')]
             draw_sets.append(Counter({color: int(num) for num, color in num_color_pairs}))
         games.append(Game(id=game_id, draw_sets=draw_sets))
 
