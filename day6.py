@@ -5,9 +5,17 @@ import operator
 from aoc_toolkit import open_puzzle_input
 
 
+def greater_int(val: float) -> int:
+    return math.floor(val + 1)
+
+
+def smaller_int(val: float) -> int:
+    return math.ceil(val - 1)
+
+
 def number_of_ways_to_beat(time: int, distance: int) -> int:
-    return len(range(math.floor((time - math.sqrt(time * time - 4 * distance)) / 2 + 1),
-                     math.ceil((time + math.sqrt(time * time - 4 * distance)) / 2)))
+    return len(range(greater_int((time - math.sqrt(time * time - 4 * distance)) / 2),
+                     smaller_int((time + math.sqrt(time * time - 4 * distance)) / 2) + 1))
 
 
 def part1(puzzle_input: list[str]):
