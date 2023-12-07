@@ -3,7 +3,7 @@ from collections import Counter
 
 from aoc_toolkit import open_puzzle_input
 
-CARDS = '23456789TJQKA'
+CARDS = 'J23456789TJQKA'
 
 
 class HandType(enum.IntEnum):
@@ -19,6 +19,11 @@ class HandType(enum.IntEnum):
     def of_hand(hand: str) -> 'HandType':
         counts = Counter(hand)
         assert counts.total() == 5
+        jokers = counts['J']
+        if jokers:
+            del counts['J']
+            top_card = counts.most_common(1)
+            counts[top_card[0][0] if top_card else 'A'] += jokers
         card_counts = sorted(counts.values())
         if card_counts == [5]:
             return HandType.FIVE_OF_A_KIND
@@ -32,8 +37,9 @@ class HandType(enum.IntEnum):
             return HandType.TWO_PAIR
         elif card_counts == [1, 1, 1, 2]:
             return HandType.ONE_PAIR
-        else:
+        elif card_counts == [1, 1, 1, 1, 1]:
             return HandType.HIGH_CARD
+        raise ValueError
 
 
 def hand_strength(hand: str) -> tuple[HandType, int, int, int, int, int]:
@@ -50,8 +56,18 @@ def part1(puzzle_input: list[str]) -> int:
     return sum((ranks.index(hand) + 1) * bid for hand, bid in hand_to_bid)
 
 
+def part2(puzzle_input: list[str]) -> int:
+    hand_to_bid = []
+    for line in puzzle_input:
+        hand, bid = line.split()
+        hand_to_bid.append((hand, int(bid)))
+
+    ranks = sorted((hand for hand, _ in hand_to_bid), key=hand_strength)
+    return sum((ranks.index(hand) + 1) * bid for hand, bid in hand_to_bid)
+
+
 if __name__ == '__main__':
     with open_puzzle_input('day7') as f:
         puzzle_input = f.read().splitlines()
-        print(part1(puzzle_input))
-        # print(part2(puzzle_input))
+        # print(part1(puzzle_input))
+        print(part2(puzzle_input))
