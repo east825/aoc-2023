@@ -3,7 +3,7 @@ import itertools
 
 from aoc_toolkit import open_puzzle_input, blank_separated_line_blocks
 
-RangeMap = list[tuple[range, range]]
+type RangeMap = list[tuple[range, range]]
 
 UNREACHABLE = 10_000_000_000
 
@@ -13,13 +13,12 @@ def part1(puzzle_input: list[list[str]]):
         range_pairs = []
         for line in block[1:]:
             dst_start, src_start, range_len = map(int, line.split())
-            range_pairs.append((range(src_start, src_start + range_len),
-                                range(dst_start, dst_start + range_len)))
+            range_pairs.append((range(src_start, src_start + range_len), range(dst_start, dst_start + range_len)))
         range_pairs.sort(key=lambda x: x[0].start)
         return range_pairs
 
     seed_block, *map_blocks = puzzle_input
-    seeds = [int(n) for n in seed_block[0].removeprefix('seeds: ').split()]
+    seeds = [int(n) for n in seed_block[0].removeprefix("seeds: ").split()]
     maps = [parse_map(block) for block in map_blocks]
 
     def find_location(seed: int) -> int:
@@ -40,23 +39,22 @@ def part2(puzzle_input: list[list[str]]):
         range_pairs = []
         for line in block[1:]:
             dst_start, src_start, range_len = map(int, line.split())
-            range_pairs.append((range(src_start, src_start + range_len),
-                                range(dst_start, dst_start + range_len)))
+            range_pairs.append((range(src_start, src_start + range_len), range(dst_start, dst_start + range_len)))
         range_pairs.sort(key=lambda x: x[0].start)
         padded_range_pairs = []
         prev_range_end = 0
         for src_range, dst_range in range_pairs:
             if src_range.start > prev_range_end:
-                padded_range_pairs.append((range(prev_range_end, src_range.start),
-                                           range(prev_range_end, src_range.start)))
+                padded_range_pairs.append(
+                    (range(prev_range_end, src_range.start), range(prev_range_end, src_range.start))
+                )
             padded_range_pairs.append((src_range, dst_range))
             prev_range_end = src_range.stop
-        padded_range_pairs.append((range(src_range.stop, UNREACHABLE),
-                                   range(src_range.stop, UNREACHABLE)))
+        padded_range_pairs.append((range(src_range.stop, UNREACHABLE), range(src_range.stop, UNREACHABLE)))
         return padded_range_pairs
 
     seed_block, *map_blocks = puzzle_input
-    header_nums = [int(n) for n in seed_block[0].removeprefix('seeds: ').split()]
+    header_nums = [int(n) for n in seed_block[0].removeprefix("seeds: ").split()]
     seed_ranges = [range(s, s + size) for s, size in itertools.batched(header_nums, 2)]
     maps = [parse_map(block) for block in map_blocks]
 
@@ -81,7 +79,7 @@ def part2(puzzle_input: list[list[str]]):
     return min(r.start for r in find_locations(seed_ranges))
 
 
-if __name__ == '__main__':
-    with open_puzzle_input('day5') as f:
+if __name__ == "__main__":
+    with open_puzzle_input("day5") as f:
         puzzle_input = list(blank_separated_line_blocks(f))
         print(part2(puzzle_input))

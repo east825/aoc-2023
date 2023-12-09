@@ -3,7 +3,7 @@ import math
 
 from aoc_toolkit import open_puzzle_input, blank_separated_line_blocks
 
-Net = dict[str, tuple[str, str]]
+type Net = dict[str, tuple[str, str]]
 
 
 def _parse_input(puzzle_input: list[list[str]]) -> tuple[str, Net]:
