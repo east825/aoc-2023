@@ -1,21 +1,15 @@
 import re
-from typing import NamedTuple
 
-from aoc_toolkit import open_puzzle_input
+from aoc_toolkit import open_puzzle_input, Pos
 
-_number_re = re.compile(r'\d+')
-
-
-class Pos(NamedTuple):
-    row: int
-    col: int
+_number_re = re.compile(r"\d+")
 
 
 def part1(schematic: list[str]) -> int:
     part_numbers: dict[Pos, int] = {}
     for row_idx, row in enumerate(schematic):
         for col_idx, c in enumerate(row):
-            if not c.isdigit() and c != '.':
+            if not c.isdigit() and c != ".":
                 part_numbers.update(find_adjacent_numbers(schematic, Pos(row_idx, col_idx)))
 
     return sum(part_numbers.values())
@@ -25,7 +19,7 @@ def part2(schematic: list[str]) -> int:
     gears = []
     for row_idx, row in enumerate(schematic):
         for col_idx, c in enumerate(row):
-            if c == '*':
+            if c == "*":
                 adjacent_numbers = list(find_adjacent_numbers(schematic, Pos(row_idx, col_idx)).values())
                 if len(adjacent_numbers) == 2:
                     gears.append(adjacent_numbers[0] * adjacent_numbers[1])
@@ -47,8 +41,8 @@ def find_adjacent_numbers(schematic: list[str], pos: Pos) -> dict[Pos, int]:
     return result
 
 
-if __name__ == '__main__':
-    with open_puzzle_input('day3') as f:
+if __name__ == "__main__":
+    with open_puzzle_input("day3") as f:
         schematic = f.read().splitlines()
         print(part1(schematic))
         print(part2(schematic))
