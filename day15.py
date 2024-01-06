@@ -1,12 +1,11 @@
+import functools
+
 from aoc_toolkit import open_puzzle_input
 
 
 def part1(puzzle_input: str) -> int:
     def hash_(s: str) -> int:
-        result = 0
-        for c in s:
-            result = ((result + ord(c)) * 17) % 256
-        return result
+        return functools.reduce(lambda res, c: ((res + ord(c)) * 17) % 256, s, 0)
 
     return sum(hash_(step) for step in puzzle_input.split(","))
 
