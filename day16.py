@@ -98,8 +98,20 @@ def part1(grid: list[str]) -> int:
     return len(energized_tiles(Beam(Pos(0, 0), Dir.RIGHT), grid))
 
 
+def part2(grid: list[str]) -> int:
+    height, width = len(grid), len(grid[0])
+    top_row = [Beam(Pos(0, col), Dir.DOWN) for col in range(width)]
+    rightmost_column = [Beam(Pos(row, width - 1), Dir.LEFT) for row in range(height)]
+    bottom_row = [Beam(Pos(height - 1, col), Dir.UP) for col in range(width)]
+    leftmost_column = [Beam(Pos(row, 0), Dir.RIGHT) for row in range(height)]
+    return max(
+        len(energized_tiles(start, grid))
+        for start in top_row + rightmost_column + bottom_row + leftmost_column
+    )
+
+
 if __name__ == "__main__":
     with open_puzzle_input("day16") as f:
         puzzle = f.read().splitlines()
         print(part1(puzzle))  # 7067
-        # print(part2(puzzle))  # ?
+        print(part2(puzzle))  # 7324
