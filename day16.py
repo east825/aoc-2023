@@ -61,33 +61,29 @@ def move_beam(beam: Beam, grid: list[str]) -> Beam | None:
     return None
 
 
-def trace_beam(beam: Beam, grid: list[str]) -> tuple[set[Beam], set[Beam]]:
-    energized: set[Beam] = {beam}
-    while True:
-        tile = grid[beam.pos.row][beam.pos.col]
-        new_beams = {
-            b
-            for d in TURNS[tile][beam.dir]
-            if (b := move_beam(Beam(beam.pos, d), grid))
-        }
-        # A loop or a dead-end reached
-        if energized > new_beams:
-            return set(), energized
-        energized |= new_beams
-        match list(new_beams):
-            case [b1, b2]:
-                return {b1, b2}, energized
-            case [single]:
-                beam = single
-
-
-def part1(grid: list[str]) -> int:
-    all_energized: set[Beam] = set()
-    untraced_sources, traced_sources = {Beam(Pos(0, 0), Dir.RIGHT)}, set()
-
+def energized_tiles(start_beam: Beam, grid: list[str]) -> set[Pos]:
     @functools.cache
-    def trace(b: Beam):
-        return trace_beam(b, grid)
+    def trace(beam: Beam) -> tuple[set[Beam], set[Beam]]:
+        energized: set[Beam] = {beam}
+        while True:
+            tile = grid[beam.pos.row][beam.pos.col]
+            new_beams = {
+                b
+                for d in TURNS[tile][beam.dir]
+                if (b := move_beam(Beam(beam.pos, d), grid))
+            }
+            # A loop or a dead-end reached
+            if energized > new_beams:
+                return set(), energized
+            energized |= new_beams
+            match list(new_beams):
+                case [b1, b2]:
+                    return {b1, b2}, energized
+                case [single]:
+                    beam = single
+
+    all_energized: set[Beam] = set()
+    untraced_sources, traced_sources = {start_beam}, set()
 
     while untraced_sources:
         beam_src = untraced_sources.pop()
@@ -95,8 +91,11 @@ def part1(grid: list[str]) -> int:
         traced_sources.add(beam_src)
         all_energized |= energized
         untraced_sources |= new_sources - traced_sources
+    return {pos for pos, _ in all_energized}
 
-    return len({pos for pos, _ in all_energized})
+
+def part1(grid: list[str]) -> int:
+    return len(energized_tiles(Beam(Pos(0, 0), Dir.RIGHT), grid))
 
 
 if __name__ == "__main__":
