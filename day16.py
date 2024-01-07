@@ -1,4 +1,6 @@
 import enum
+import functools
+import typing
 from collections import defaultdict
 
 from aoc_toolkit import open_puzzle_input, Pos
@@ -9,6 +11,11 @@ class Dir(enum.Enum):
     RIGHT = (0, 1)
     DOWN = (1, 0)
     LEFT = (0, -1)
+
+
+class Beam(typing.NamedTuple):
+    pos: Pos
+    dir: Dir
 
 
 TURNS: dict[str, dict[Dir, list[Dir]]] = {
@@ -45,27 +52,51 @@ TURNS: dict[str, dict[Dir, list[Dir]]] = {
 }
 
 
-def move_pos(pos: Pos, direction: Dir, grid: list[str]) -> Pos | None:
-    drow, dcol = direction.value
-    new_pos = Pos(pos.row + drow, pos.col + dcol)
+def move_beam(beam: Beam, grid: list[str]) -> Beam | None:
+    drow, dcol = beam.dir.value
+    new_pos = Pos(beam.pos.row + drow, beam.pos.col + dcol)
     height, width = len(grid), len(grid[0])
-    return new_pos if 0 <= new_pos.row < height and 0 <= new_pos.col < width else None
+    if 0 <= new_pos.row < height and 0 <= new_pos.col < width:
+        return Beam(new_pos, beam.dir)
+    return None
+
+
+def trace_beam(beam: Beam, grid: list[str]) -> tuple[set[Beam], set[Beam]]:
+    energized: set[Beam] = {beam}
+    while True:
+        tile = grid[beam.pos.row][beam.pos.col]
+        new_beams = {
+            b
+            for d in TURNS[tile][beam.dir]
+            if (b := move_beam(Beam(beam.pos, d), grid))
+        }
+        # A loop or a dead-end reached
+        if energized > new_beams:
+            return set(), energized
+        energized |= new_beams
+        match list(new_beams):
+            case [b1, b2]:
+                return {b1, b2}, energized
+            case [single]:
+                beam = single
 
 
 def part1(grid: list[str]) -> int:
-    energized_tiles: dict[Pos, set[Dir]] = defaultdict(set)
-    energized_tiles[Pos(0, 0)].add(Dir.RIGHT)
-    while True:
-        total_beams = sum(map(len, energized_tiles.values()))
-        for pos, beams in list(energized_tiles.items()):
-            for beam_dir in beams:
-                for next_dir in TURNS[grid[pos.row][pos.col]][beam_dir]:
-                    next_pos = move_pos(pos, next_dir, grid)
-                    if next_pos:
-                        energized_tiles[next_pos].add(next_dir)
-        if total_beams == sum(map(len, energized_tiles.values())):
-            break
-    return len(energized_tiles)
+    all_energized: set[Beam] = set()
+    untraced_sources, traced_sources = {Beam(Pos(0, 0), Dir.RIGHT)}, set()
+
+    @functools.cache
+    def trace(b: Beam):
+        return trace_beam(b, grid)
+
+    while untraced_sources:
+        beam_src = untraced_sources.pop()
+        new_sources, energized = trace(beam_src)
+        traced_sources.add(beam_src)
+        all_energized |= energized
+        untraced_sources |= new_sources - traced_sources
+
+    return len({pos for pos, _ in all_energized})
 
 
 if __name__ == "__main__":
