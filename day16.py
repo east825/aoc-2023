@@ -1,7 +1,6 @@
 import enum
 import functools
 import typing
-from collections import defaultdict
 
 from aoc_toolkit import open_puzzle_input, Pos
 
@@ -62,6 +61,7 @@ def move_beam(beam: Beam, grid: list[str]) -> Beam | None:
 
 
 def energized_tiles(start_beam: Beam, grid: list[str]) -> set[Pos]:
+    # TODO move this function to top-level to make the caching actually work
     @functools.cache
     def trace(beam: Beam) -> tuple[set[Beam], set[Beam]]:
         energized: set[Beam] = {beam}
