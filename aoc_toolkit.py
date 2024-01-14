@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import enum
 from pathlib import Path
 from typing import TextIO, Generator, Any, NamedTuple
@@ -33,3 +35,15 @@ class Dir(enum.Enum):
     RIGHT = (0, 1)
     DOWN = (1, 0)
     LEFT = (0, -1)
+
+    @property
+    def opposite(self) -> Dir:
+        match self:
+            case Dir.RIGHT:
+                return Dir.LEFT
+            case Dir.LEFT:
+                return Dir.RIGHT
+            case Dir.UP:
+                return Dir.DOWN
+            case Dir.DOWN:
+                return Dir.UP
