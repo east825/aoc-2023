@@ -1,3 +1,4 @@
+import enum
 from pathlib import Path
 from typing import TextIO, Generator, Any, NamedTuple
 
@@ -25,3 +26,10 @@ def blank_separated_line_blocks(file: TextIO) -> Generator[list[str], Any, Any]:
 class Pos(NamedTuple):
     row: int
     col: int
+
+
+class Dir(enum.Enum):
+    UP = (-1, 0)
+    RIGHT = (0, 1)
+    DOWN = (1, 0)
+    LEFT = (0, -1)
