@@ -5,12 +5,12 @@ from typing import Callable, Iterable
 
 from aoc_toolkit import open_puzzle_input, Pos, Dir
 
+type NeighbourFunc[Node] = Callable[[Node], Iterable[tuple[Node, int]]]
+type CostMap[Node] = dict[Node, int]
+type ParentMap[Node] = dict[Node, Node]
 
-def dijkstra[
-    Node
-](start: Node, adj: Callable[[Node], Iterable[tuple[Node, int]]]) -> tuple[
-    dict[Node, int], dict[Node, Node]
-]:
+
+def dijkstra[Node](start: Node, adj: NeighbourFunc) -> tuple[CostMap, ParentMap]:
     distances = {start: 0}
     parents = {}
     tie_breaker = itertools.count()
