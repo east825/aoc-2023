@@ -36,7 +36,7 @@ type State = tuple[Pos, Dir | None]
 def part1(grid: list[str]):
     height, width = len(grid), len(grid[0])
 
-    def adj(node: State) -> list[tuple[State, int]]:
+    def crucible_adj(node: State) -> list[tuple[State, int]]:
         result: list[tuple[State, int]] = []
         pos, prev_dir = node
         for dir_ in Dir:
@@ -52,7 +52,32 @@ def part1(grid: list[str]):
         return result
 
     start, finish = Pos(0, 0), Pos(height - 1, width - 1)
-    distances, _ = dijkstra((start, None), adj)
+    distances, _ = dijkstra((start, None), crucible_adj)
+    return min(dist for (pos, _), dist in distances.items() if pos == finish)
+
+
+def part2(grid: list[str]):
+    height, width = len(grid), len(grid[0])
+
+    def ultra_crucible_adj(node: State) -> list[tuple[State, int]]:
+        result: list[tuple[State, int]] = []
+        pos, prev_dir = node
+        for dir_ in Dir:
+            if prev_dir and dir_ in (prev_dir, prev_dir.opposite):
+                continue
+            heat_loss = 0
+            for size in range(1, 11):
+                drow, dcol = dir_.value
+                new_pos = Pos(pos.row + drow * size, pos.col + dcol * size)
+                if not (0 <= new_pos.row < height and 0 <= new_pos.col < width):
+                    break
+                heat_loss += int(grid[new_pos.row][new_pos.col])
+                if size >= 4:
+                    result.append(((new_pos, dir_), heat_loss))
+        return result
+
+    start, finish = Pos(0, 0), Pos(height - 1, width - 1)
+    distances, _ = dijkstra((start, None), ultra_crucible_adj)
     return min(dist for (pos, _), dist in distances.items() if pos == finish)
 
 
@@ -60,3 +85,4 @@ if __name__ == "__main__":
     with open_puzzle_input("day17") as f:
         puzzle = f.read().splitlines()
         print(part1(puzzle))  # 635
+        print(part2(puzzle))  # 734
