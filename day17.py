@@ -30,7 +30,7 @@ def dijkstra[Node](start: Node, adj: NeighbourFunc) -> tuple[CostMap, ParentMap]
     return distances, parents
 
 
-type State = tuple[Pos, Dir]
+type State = tuple[Pos, Dir | None]
 
 
 def part1(grid: list[str]):
@@ -52,11 +52,11 @@ def part1(grid: list[str]):
         return result
 
     start, finish = Pos(0, 0), Pos(height - 1, width - 1)
-    distances, _ = dijkstra((start, Dir.RIGHT), adj)
+    distances, _ = dijkstra((start, None), adj)
     return min(dist for (pos, _), dist in distances.items() if pos == finish)
 
 
 if __name__ == "__main__":
     with open_puzzle_input("day17") as f:
         puzzle = f.read().splitlines()
-        print(part1(puzzle))  # ?
+        print(part1(puzzle))  # 635
